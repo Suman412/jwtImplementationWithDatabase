@@ -1,17 +1,16 @@
 package com.suman.project1.controller;
-import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.suman.project1.model.UserModel;
 import com.suman.project1.service.UserService;
-@CrossOrigin(origins="*")
+@CrossOrigin(origins="http://192.168.1.108:4200")
 @RestController
 public class UserController 
 {
@@ -32,19 +31,19 @@ public class UserController
 	{
 		return userservice.saveUser(model);//return new user object with id
 	}
-	@PutMapping("/update")
+	@PostMapping("/update")
 	public Object update(@RequestBody UserModel model)
 	{
 		return userservice.update(model);
 	}
-	@DeleteMapping("/delete/{id}")
+	@GetMapping("/delete/{id}")
 	public Object delete(@PathVariable("id")int id)
 	{
 		return userservice.delete(id);
 	}
-	@GetMapping("/signout")
-	public String logout(HttpSession session)
+	@GetMapping("/token")
+	public ResponseEntity<?> token()
 	{
-		return userservice.logout(session);
+		return userservice.token();
 	}
 }

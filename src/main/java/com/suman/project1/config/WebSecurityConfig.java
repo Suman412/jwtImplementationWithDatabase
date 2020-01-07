@@ -1,6 +1,4 @@
 package com.suman.project1.config;
-import java.util.Arrays;
-import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,9 +46,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		// We don't need CSRF for this example
 		httpSecurity
-				//.csrf().disable()
+				.csrf().disable()
 				// dont authenticate this particular request
-				.authorizeRequests().antMatchers("/adduser", "/login").permitAll().
+				.authorizeRequests().antMatchers("/login").permitAll().
 				// all other requests need to be authenticated
 				anyRequest().authenticated().and()
 				// make sure we use stateless session; session won't be used to
@@ -62,37 +60,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// Add a filter to validate the tokens with every request
 		httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 	}
-	/*@Bean
+	@Bean
     CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new
                 UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
-    }*/
-	 @Bean
-	    public CorsConfigurationSource corsConfigurationSource() {
-	        final CorsConfiguration configuration = new CorsConfiguration();
-	        configuration.setAllowedOrigins(Collections.unmodifiableList(Arrays.asList("*")));
-	       // configuration.setAllowedMethods(ImmutableList.of("HEAD","GET", "POST", "PUT", "DELETE", "PATCH"));
-	        configuration.setAllowedMethods(Collections.unmodifiableList(Arrays.asList("GET", "POST", "PUT", "DELETE")));
-	        // setAllowCredentials(true) is important, otherwise:
-	        // The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
-	        configuration.setAllowCredentials(true);
-	        // setAllowedHeaders is important! Without it, OPTIONS preflight request
-	        // will fail with 403 Invalid CORS request
-	        configuration.setAllowedHeaders(Collections.unmodifiableList(Arrays.asList("Authorization", "Cache-Control", "Content-Type")));
-	        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	        source.registerCorsConfiguration("/**", configuration);
-	        return source;
-	    }
-}
-/*@Configuration
-class WebConfig extends WebMvcConfigurerAdapter {
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedMethods("GET", "PUT", "POST", "DELETE");
     }
-}*/
-
+}

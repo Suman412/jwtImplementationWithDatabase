@@ -1,10 +1,16 @@
 package com.suman.project1.service;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.suman.project1.common.CustomSuccessResponse;
+import com.suman.project1.config.JwtTokenUtil;
+import com.suman.project1.model.JwtResponse;
 //import com.suman.project1.model.FetchUserModel;
 import com.suman.project1.model.UserModel;
 import com.suman.project1.repository.Userrepo;
@@ -16,6 +22,15 @@ public class UserService implements UserServiceInterface
 	private PasswordEncoder bcryptEncoder;
 	@Autowired
 	private Userrepo userrepo;
+	
+	@Autowired
+	private JwtUserDetailsService jwtUserDetailsService;
+	
+	@Autowired
+	private JwtTokenUtil jwtTokenUtil;
+	
+	@Autowired
+	HttpServletRequest request;
 	//@Autowired
 	//private FetchUserModel fetchUserModel;
 	/*public Object validate(UserModel model)
@@ -62,7 +77,6 @@ public class UserService implements UserServiceInterface
 		}
 		else
 		{
-			System.out.println(model.getPassword());
 			model.setPassword(bcryptEncoder.encode(model.getPassword()));
 			model.setModifyBy(model.getCreatedBy());
 			model.setCreatedDate(java.time.LocalDate.now());
@@ -253,9 +267,15 @@ public class UserService implements UserServiceInterface
 		}
 		return new CustomSuccessResponse(HttpStatus.NOT_FOUND.value(),"id not found", new UserModel());
 	}
-	public String logout(HttpSession session) 
-	{
-		session.invalidate();
-		return "logout successfully";
+	public ResponseEntity<?> token()
+	{		
+		final String headerToken=request.getHeader("Authorization").substring(7);
+		System.out.println(headerToken);
+		System.out.println(jwtTokenUtil.getUsernameFromToken(headerToken));
+		final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(headerToken));
+		System.out.println(userDetails);
+		final String token = jwtTokenUtil.generateToken(userDetails);
+		System.out.println(new JwtResponse(token));
+		return ResponseEntity.ok(new JwtResponse(token));
 	}
 }

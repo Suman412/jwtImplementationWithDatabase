@@ -16,7 +16,7 @@ import com.suman.project1.model.JwtResponse;
 import com.suman.project1.service.JwtUserDetailsService;
 
 @RestController
-@CrossOrigin(origins="*")//http://192.168.1.108:4200
+@CrossOrigin(origins="http://192.168.1.108:4200")
 public class JwtAuthenticationController {
 
 	@Autowired
@@ -30,7 +30,6 @@ public class JwtAuthenticationController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
@@ -39,7 +38,6 @@ public class JwtAuthenticationController {
 
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
-	
 	private void authenticate(String username, String password) throws Exception {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));

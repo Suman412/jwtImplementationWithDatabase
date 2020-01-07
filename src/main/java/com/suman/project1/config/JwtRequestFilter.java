@@ -1,5 +1,4 @@
 package com.suman.project1.config;
-
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
@@ -30,36 +29,43 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws ServletException, IOException {
-
-		final String requestTokenHeader = request.getHeader("Authorization");
-
+			throws ServletException, IOException 
+	{
+		final String requestTokenHeader = request.getHeader("Authorization");//check request header's authorization field
 		String username = null;
 		String jwtToken = null;
 		// JWT Token is in the form "Bearer token". Remove Bearer word and get
 		// only the Token
-		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-			jwtToken = requestTokenHeader.substring(7);
-			try {
-				username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-			} catch (IllegalArgumentException e) {
+		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) 
+		{
+			jwtToken = requestTokenHeader.substring(7);//take only the token. it eliminates the "bearer "
+			try 
+			{
+				username = jwtTokenUtil.getUsernameFromToken(jwtToken);//first check it is expired or not, then check for the username
+			}
+			catch (IllegalArgumentException e) 
+			{
 				System.out.println("Unable to get JWT Token");
-			} catch (ExpiredJwtException e) {
+			} catch (ExpiredJwtException e) 
+			{
 				System.out.println("JWT Token has expired");
 			}
-		} else {
+		}
+		else 
+		{
 			logger.warn("JWT Token does not begin with Bearer String");
 		}
 
 		// Once we get the token validate it.
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) 
+		{
 
 			UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
 
 			// if token is valid configure Spring Security to manually set
 			// authentication
-			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-
+			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) //check valid username and expiry
+			{
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				usernamePasswordAuthenticationToken
@@ -70,6 +76,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 			}
 		}
-		chain.doFilter(request, response);
+		chain.doFilter(request,response);
 	}
 }
